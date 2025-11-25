@@ -28,9 +28,8 @@ def mostrar_ayuda_navegacion():
     console.print("")
 
 def mostrar_resumen_vivo(circ):
-    """Muestra el diagrama de conexiones en la terminal."""
     if not circ.resistors and not circ.vsources:
-        # AQUÍ ESTABA EL ERROR ANTES. AHORA USA [/] PARA CERRAR.
+        # ARREGLADO: Cerrado correctamente con [/]
         console.print(Panel("[dim italic]El circuito está vacío. Agrega componentes.[/]", title="Lienzo del Circuito", border_style="dim"))
         return
 

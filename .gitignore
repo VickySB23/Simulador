@@ -1,5 +1,17 @@
+# --- Python ---
 venv/
 __pycache__/
 *.pyc
-outputs/
 .ipynb_checkpoints/
+
+# --- Archivos generados por el Simulador ---
+# Ignoramos las imágenes para no ensuciar el repositorio
+*.png
+*.jpg
+# Ignoramos reportes de datos
+*.csv
+outputs/
+
+# --- Sistema Operativo ---
+.DS_Store
+Thumbs.db
