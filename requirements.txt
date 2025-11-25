@@ -1,4 +1,3 @@
 numpy
 matplotlib
-
-# opcionales: networkx, scipy, ipywidgets, streamlit
+rich
