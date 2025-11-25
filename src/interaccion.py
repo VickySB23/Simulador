@@ -15,15 +15,14 @@ def input_inteligente(mensaje, tipo="float", default=None):
     - Soporta comandos Q (Salir), R (Reiniciar), B (Atrás).
     - Convierte unidades (10k -> 10000).
     - Maneja Enter vacío si hay default.
+    - show_default=False evita que se duplique el texto en la terminal.
     """
     while True:
-        # Si hay default, lo mostramos en el prompt
-        msg_final = mensaje
+        # Pedimos el input. Ocultamos el default visual automático para controlar nosotros el texto.
+        valor_raw = Prompt.ask(mensaje, default=default, show_default=False)
         
-        valor_raw = Prompt.ask(msg_final, default=default)
-        
-        # Si el usuario da Enter y hay default, Prompt.ask ya devuelve el default.
-        # Pero si devuelve None (caso raro), lo convertimos a string vacío.
+        # Si el usuario da Enter y hay default, Prompt devuelve el default.
+        # Convertimos a string para procesar comandos.
         if valor_raw is None:
             val = ""
         else:
@@ -44,7 +43,7 @@ def input_inteligente(mensaje, tipo="float", default=None):
         
         # Si esperamos número
         if tipo == "float":
-            if val == "": return None # Si es vacio, devolvemos None
+            if val == "": return None 
             try:
                 return parse_value(val)
             except ValueError:
@@ -80,9 +79,10 @@ def modo_crear_circuito():
             # --- RESISTENCIA ---
             if opcion == "1":
                 ui.console.print(f"\n[cyan]--- Nueva Resistencia R{cont_r} ---[/cyan]")
+                # Ahora se verá limpio: "Valor en Ohms (ej: 1k): "
                 val = input_inteligente("  Valor en Ohms (ej: 1k)", default="1k")
                 n1 = input_inteligente("  Nodo Entrada", tipo="str")
-                n2 = input_inteligente("  Nodo Salida [dim](0=Tierra)[/dim]", tipo="str", default="0")
+                n2 = input_inteligente("  Nodo Salida [dim](Enter=0/Tierra)[/dim]", tipo="str", default="0")
                 
                 circ.add_resistor(f"R{cont_r}", n1, n2, val)
                 ui.console.print(f"[green]✓ R{cont_r} agregada[/green]")
@@ -94,7 +94,7 @@ def modo_crear_circuito():
                 ui.console.print(f"\n[cyan]--- Nueva Fuente V{cont_v} ---[/cyan]")
                 val = input_inteligente("  Voltaje en Volts (ej: 12)", default="12")
                 n_pos = input_inteligente("  Nodo Positivo (+)", tipo="str")
-                n_neg = input_inteligente("  Nodo Negativo (-) [dim](Enter para 0)[/dim]", tipo="str", default="0")
+                n_neg = input_inteligente("  Nodo Negativo (-) [dim](Enter=0/Tierra)[/dim]", tipo="str", default="0")
                 
                 circ.add_vsource(f"V{cont_v}", n_pos, n_neg, val)
                 ui.console.print(f"[green]✓ V{cont_v} agregada[/green]")

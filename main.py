@@ -7,7 +7,20 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 
 import ui
 import interaccion
-from circuit_sim import load_netlist
+# IMPORTANTE: Agregamos 'draw_circuit' a los imports
+from circuit_sim import load_netlist, draw_circuit
+
+def abrir_imagen(ruta):
+    """Intenta abrir la imagen automáticamente según el sistema operativo."""
+    try:
+        if sys.platform.startswith('win'):
+            os.startfile(ruta)
+        elif sys.platform.startswith('darwin'): # Mac
+            os.system(f'open "{ruta}"')
+        else: # Linux
+            os.system(f'xdg-open "{ruta}"')
+    except Exception:
+        pass # Si falla, no pasa nada, el usuario la abre manual
 
 def sesion_usuario():
     ui.mostrar_encabezado()
@@ -36,7 +49,7 @@ def sesion_usuario():
             circ = interaccion.modo_crear_circuito()
         
         else:
-            return # Opción inválida, recarga menú
+            return 
 
         # --- CÁLCULO ---
         if circ:
@@ -45,17 +58,23 @@ def sesion_usuario():
                 voltages, res_currents, vsrc_currents = circ.solve()
                 ui.mostrar_resultados(voltages, res_currents, vsrc_currents)
                 
+                # --- NUEVA SECCIÓN DE GRÁFICOS ---
+                ui.console.print("")
+                if Confirm.ask("[bold cyan]¿Desea generar el gráfico del circuito?[/bold cyan]"):
+                    nombre_img = "resultado_circuito.png"
+                    
+                    # Llamamos a la función de dibujo de tu motor
+                    draw_circuit(circ, voltages, res_currents, vsrc_currents, save_path=nombre_img)
+                    
+                    ui.console.print(f"[green]✓ Gráfico guardado como: {nombre_img}[/green]")
+                    abrir_imagen(nombre_img) # Intenta abrirlo solo
+                
                 interaccion.input_inteligente("\n[Presione Enter para Reiniciar]", tipo="str", default="")
                 
             except Exception as e:
-                # AQUÍ ESTÁ EL CAMBIO: Manejo elegante del error
-                ui.console.print(Panel(f"[bold red]Error Matemático:[/bold red] {e}\n\nProbable causa: Circuito abierto o sin conexión a Tierra (nodo 0).", title="ERROR", border_style="red"))
+                ui.console.print(ui.Panel(f"[bold red]Error Matemático:[/bold red] {e}\n\nProbable causa: Circuito abierto o sin conexión a Tierra (nodo 0).", title="ERROR", border_style="red"))
                 
-                # Preguntar si quiere reintentar
                 if Confirm.ask("¿Desea intentar corregir el circuito? (S/N)"):
-                    # Si dice Sí, volvemos al menú principal (donde podría elegir crear de nuevo)
-                    # En una versión más avanzada podríamos dejarle editar, 
-                    # pero por ahora reiniciar es lo más seguro para el coloquio.
                     return 
                 else:
                     sys.exit(0)
@@ -74,7 +93,7 @@ def main():
             break
         except Exception as e:
             ui.console.print(f"[bold red]Error Inesperado:[/bold red] {e}")
-            input("Presione Enter para salir...")
+            input("Enter para salir...")
             break
 
 if __name__ == "__main__":
